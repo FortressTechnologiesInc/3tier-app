@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: easyshop
+  labels:
+    name: easyshop
+    environment: production
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/mongodb
+  persistentVolumeReclaimPolicy: Retain
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: easyshop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+-apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: easyshop-config
+  namespace: easyshop
+data:
+  MONGODB_URI: "mongodb://mongodb-service:27017/easyshop"
+  NODE_ENV: "production"
+  NEXT_PUBLIC_API_URL: "https://easyshop.devopsdock.site/api"
+  NEXTAUTH_URL: "https://easyshop.devopsdock.site/"
+  NEXTAUTH_SECRET: "HmaFjYZ2jbUK7Ef+wZrBiJei4ZNGBAJ5IdiOGAyQegw="
+  JWT_SECRET: "e5e425764a34a2117ec2028bd53d6f1388e7b90aeae9fa7735f2469ea3a6cc8c"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: easyshop-secrets
+  namespace: easyshop
+type: Opaque
+stringData:
+  JWT_SECRET: "change-this-in-production"
+  NEXTAUTH_SECRET: "change-this-in-production"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: easyshop
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    app: mongodb
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: easyshop
+spec:
+  serviceName: mongodb-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:6.0.13
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: mongodb-storage
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: easyshop
+  namespace: easyshop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: easyshop
+  template:
+    metadata:
+      labels:
+        app: easyshop
+    spec:
+      containers:
+        - name: easyshop
+          image: iscanprint/3tier:3.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: easyshop-config
+            - secretRef:
+                name: easyshop-secrets
+          env:
+            - name: NEXTAUTH_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: easyshop-config
+                  key: NEXTAUTH_URL
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: easyshop-secrets
+                  key: NEXTAUTH_SECRET
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: easyshop-secrets
+                  key: JWT_SECRET
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 3000
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 25
+            periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: easyshop-service
+  namespace: easyshop
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 3000
+      nodePort: 30000
+  selector:
+    app: easyshop
+
+
+
