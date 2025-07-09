@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  migration:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile.migration
+    container_name: easyshop-migration
+    env_file:
+      - .env.local
+    networks:
+      - easyshop-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: easyshop
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    networks:
+      - easyshop-network
+    restart: unless-stopped
+
+networks:
+  easyshop-network:
+    name: easyshop-network
