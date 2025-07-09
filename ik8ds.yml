@@ -13,7 +13,7 @@ metadata:
   namespace: easyshop
 data:
   # Replace <username>, <password>, <cluster-url>, and <dbname> with actual values
-  MONGODB_URI: "mongodb-uri: mongodb+srv://admin:admin123@mongodb-demo.p1jch.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-demo"
+  MONGODB_URI: "mongodb+srv://admin:admin123@mongodb-demo.p1jch.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-demo"
   NODE_ENV: "production"
   NEXT_PUBLIC_API_URL: "https://easyshop.devopsdock.site/api"
   NEXTAUTH_URL: "https://easyshop.devopsdock.site/"
