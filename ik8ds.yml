@@ -12,7 +12,6 @@ metadata:
   name: easyshop-config
   namespace: easyshop
 data:
-  # Replace <username>, <password>, <cluster-url>, and <dbname> with actual values
   MONGODB_URI: "mongodb+srv://admin:admin123@mongodb-demo.p1jch.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-demo"
   NODE_ENV: "production"
   NEXT_PUBLIC_API_URL: "https://13.58.9.105/api"
@@ -104,10 +103,30 @@ metadata:
   name: easyshop-service
   namespace: easyshop
 spec:
-  type: NodePort
+  type: LoadBalancer    #NodePort
   ports:
     - port: 80
       targetPort: 3000
       nodePort: 30000
   selector:
     app: easyshop
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: easyshop-autoscaler
+  namespace: easyshop
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: easyshop
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
