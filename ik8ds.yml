@@ -14,8 +14,8 @@ metadata:
 data:
   MONGODB_URI: "mongodb+srv://admin:admin123@mongodb-demo.p1jch.mongodb.net/?retryWrites=true&w=majority&appName=mongodb-demo"
   NODE_ENV: "production"
-  NEXT_PUBLIC_API_URL: "https://13.58.9.105/api"
-  NEXTAUTH_URL: "https://13.58.9.105/"
+  NEXT_PUBLIC_API_URL: "https://192.168.1.12/api"
+  NEXTAUTH_URL: "https://192.168.1.12/"
   NEXTAUTH_SECRET: "HmaFjYZ2jbUK7Ef+wZrBiJei4ZNGBAJ5IdiOGAyQegw="
   JWT_SECRET: "e5e425764a34a2117ec2028bd53d6f1388e7b90aeae9fa7735f2469ea3a6cc8c"
 ---
