@@ -23,7 +23,7 @@ jobs:
 
   sonar-check:
     runs-on: wrkz
-    needs: trivy_fs_scan
+  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
