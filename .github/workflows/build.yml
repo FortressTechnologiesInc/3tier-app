@@ -36,11 +36,11 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t iscanprint/3tier:3.0 .
+        docker build -t iscanprint/3tier:3.1 .
 
     - name: Push Docker image
       run: |
-        docker push iscanprint/3tier:3.0
+        docker push iscanprint/3tier:3.1
 
     - name: Logout from Docker Hub
       run: docker logout
