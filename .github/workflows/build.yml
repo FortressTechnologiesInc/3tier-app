@@ -38,7 +38,7 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
 
-    sonar-check:
+  sonar-check:
     runs-on: wrkz
     needs: trivy_fs_scan
     steps:
@@ -61,7 +61,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-
       - name: Check Java version
         run: java -version
 
@@ -81,22 +80,4 @@ jobs:
         run: docker push iscanprint/3tier:3.1
 
       - name: Logout from Docker Hub
-        run: docker logout
-
-  trivy_image_scan:
-    runs-on: wrkz
-    needs: sonar-check
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy image scan (backend)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: image
-          image-ref: iscanprint/3tier:3.1
-          format: table
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
+        run: do
