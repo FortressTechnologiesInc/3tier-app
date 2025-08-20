@@ -38,12 +38,15 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
 
-  sonar-check:
+    sonar-check:
     runs-on: wrkz
     needs: trivy_fs_scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install unzip (required for SonarQube scanner)
+        run: sudo apt-get update && sudo apt-get install -y unzip
 
       - name: SonarQube Scan (client)
         uses: sonarsource/sonarqube-scan-action@master
@@ -57,6 +60,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
 
       - name: Check Java version
         run: java -version
