@@ -1,4 +1,4 @@
-name: Build and Package
+name: Sonar-Check && Build/Push
 
 on:
   push:
@@ -23,7 +23,6 @@ jobs:
 
   sonar-check:
     runs-on: wrkz
-  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,10 +30,10 @@ jobs:
       - name: Install unzip (required for SonarQube scanner)
         run: sudo apt-get update && sudo apt-get install -y unzip
 
-      - name: SonarQube Scan (client)
+      - name: SonarQube Scan (3tier)
         uses: sonarsource/sonarqube-scan-action@master
         with:
-          projectBaseDir: 3tier
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=3tier
             -Dsonar.projectName=3tier
