@@ -35,8 +35,8 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=3tier
-            -Dsonar.projectName=3tier
+            -Dsonar.projectKey=3tier-app
+            -Dsonar.projectName=3tier-app
             -Dsonar.sources=.
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
         env:
